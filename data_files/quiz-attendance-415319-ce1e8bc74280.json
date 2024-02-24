@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "quiz-attendance-415319",
+  "private_key_id": "ce1e8bc74280f7efb39ea179e1c322f0b284a98c",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCLya6URWyWP6tQ\nH7q7aU/dNBAS/9htFVlxelkyh6ADx1EBn+heIo4gPJBXYSdz7AvE+DU/VNOYozE5\nbZyNx2mG88oPWO9MnbliTlhlasGpFyT903I7UOrVI3kYjyH/2cg2gTCUTgw6js9D\nLlKtcMvhAv0J54Aj6S7DRVzS8vhRpTDiex9QjRTjYIISHnf1iedmjf4oDMbJbPC8\n3jwCRBAO63HXmliIQfLdVCE08fGe2ZiiyD0YePzQRwEGrH3yA31LIOg4Ejm7Hskn\nDjLXprCfMmBUJL4QThn/Q0m8rdib3l/EaGn9QeU/KejEeu2btnn1NjINNvaLk4c9\ncJtT6dn/AgMBAAECggEAD3+CzYmM6nOQqMd7yn94jUvSZGjdM+rkCcLI1ONYiFK2\n1nlGJ/mozEYqsqVg3GdVPrdOIAFlnEyrjnRqoQV027N3uY/gqBvsi8un3Uaixf58\n6W9iANWN06elK2XjHRymJ/TWz/p/PJbMv+QI4pXY5M+SAmEaQeD+gEPWcMTjZxnB\niSYfE3uBMdywng28DB1GdkspzMifxGxJ8gQlqv4AXi+nrINVWZHjU9cdtozRiRv4\ni1GeuqyMzyKH5ePeodAIjEmz9xJHXg7M8/RrXwNcPkzTVS5+M28vtyZo1E4iL7WH\nHiVgoNwMYyr31PCiYXNr4CdB3P7zGGNMQQKx9IufUQKBgQC+O1JlZf94/5Z3d5eW\nbQVzDAnt/i8y6ngTqWrKBiMEx7eDpjp3E4Daz6fQ9gQlNw7vSxfREl51sfCHyh+g\ndlCeBd5nf/mEWPBf57/L3oLKReau63OQaBRVZtwB/F6/E3VqwVaXMzAGUIibTGMN\ncaaDwM+0+Ucz4NYLlfN5l5CplQKBgQC8HcOZzE2aSpobs1F2/sgmt1TrK9LY9dsP\ncqVqi7+vCFjb77xoA0MACMudoNtVZG08o8knT1ejqwJxVGAr/hs354hBIdstTauF\njDS0yWjXR/554dPwfvRjw6onB7oMbo8wxygiMftrQYUU0X9FoZQJhvIUW5It8DR5\n4brlTamYQwKBgGUVzsX0+llIr6MSGKolipTE2+3seRY8Q8xm5UkvE6KxodHCHiUy\nZvFfERTX9gH0jOoZZDGD6k/uWxs9C6tP06z0/2bOOT/bpve/hUqHFcb4eAmRMhqV\nQ+DRxK0Fdy9f3q/4xtOXrrhcSQsE/0mgj9RJO9Y19GEb44HKj9OX95Y1AoGBAKCp\n9xYTBLBjSO2hoFE2V3GhoNheDG2axWaTLy4pfyQZx/LH9S0MpBuSZ30QFmP/KsDg\nzftR63LwqlxqiNzp4QtFJv0h0lUGAhlEXvuNDYrYhUJJmr7LXyUZxugg1Eir4IXz\ngpZ6A9ZeFjBqoP2ye4ILjBPRBa9QeTEjloEjbFaLAoGAGB4AK6hlpyyojmjAMbbm\n+oz9RUTCNnrOxlKmHJt0ntzZSJ5RU1Y5YuJwGhUwAAEziw7Qevz4ARwunCHgphZd\nw+ZMqPKC0sfXzQAFyq2xeC/NONxa87zhAqsLZZbJVIVBJmmQDeIxxMmscowohg0T\nEyz44YpY1H0CjtokOo35X/A=\n-----END PRIVATE KEY-----\n",
+  "client_email": "sanket-quiz-attendance@quiz-attendance-415319.iam.gserviceaccount.com",
+  "client_id": "106725906102890791374",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/sanket-quiz-attendance%40quiz-attendance-415319.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
