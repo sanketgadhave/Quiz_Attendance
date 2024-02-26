@@ -166,27 +166,27 @@ if st.session_state.current_page == 'main':
             else:
                 st.error("Failed to fetch the active sheet name. Please check the configuration.")
 
-        config = configparser.ConfigParser()
-        config.read('data_files/google_sheet_url.properties')
-        active_subject = get_active_subject(service, subject_to_spreadsheet_id['DIC'])
-        base_url = config.get('URLs', active_subject)
-        if st.session_state.qr_code_authenticated and is_qr_session_valid():
-            st.header("TA QR Code Processing")
-            qr_code_content = st.text_area("Paste QR code content here:")
-            process_button = st.button("Process QR Code")
+    config = configparser.ConfigParser()
+    config.read('data_files/google_sheet_url.properties')
+    active_subject = get_active_subject(service, subject_to_spreadsheet_id['DIC'])
+    base_url = config.get('URLs', active_subject)
+    if st.session_state.qr_code_authenticated and is_qr_session_valid():
+        st.header("TA QR Code Processing")
+        qr_code_content = st.text_area("Paste QR code content here:")
+        process_button = st.button("Process QR Code")
 
-            if process_button and qr_code_content:
-                # Assuming the QR code content is a URL with parameters
-                parsed_content = urllib.parse.parse_qs(urllib.parse.urlparse(qr_code_content).query)
-                ub_person_number = parsed_content.get('UBPersonNumber', [None])[0]
-                sheet_name = parsed_content.get('SheetName', [None])[0]
+        if process_button and qr_code_content:
+            # Assuming the QR code content is a URL with parameters
+            parsed_content = urllib.parse.parse_qs(urllib.parse.urlparse(qr_code_content).query)
+            ub_person_number = parsed_content.get('UBPersonNumber', [None])[0]
+            sheet_name = parsed_content.get('SheetName', [None])[0]
 
-                if ub_person_number and sheet_name:
-                    # Function to mark attendance; Implement as needed
-                    # For example, redirecting or making a request to your Google Apps Script
-                    mark_attendance(ub_person_number, sheet_name, base_url)
-                else:
-                    st.error("Invalid QR code content. Please check and try again.")
-        elif st.session_state.qr_code_authenticated:
-            # If the session exists but is not valid, prompt for re-authentication
-            st.error("QR code session has expired. Please login again.")
+            if ub_person_number and sheet_name:
+                # Function to mark attendance; Implement as needed
+                # For example, redirecting or making a request to your Google Apps Script
+                mark_attendance(ub_person_number, sheet_name, base_url)
+            else:
+                st.error("Invalid QR code content. Please check and try again.")
+    elif st.session_state.qr_code_authenticated:
+        # If the session exists but is not valid, prompt for re-authentication
+        st.error("QR code session has expired. Please login again.")
