@@ -1,54 +1,31 @@
-def update_configuration_sheet(service, subject, new_sheet_name, subject_to_spreadsheet_id):
-    config_spreadsheet_id = subject_to_spreadsheet_id['DIC']  # Configuration storage location
-    config_range = "Configuration!A2:B"
+def update_configuration_sheet(service, subject, column_name, subject_to_spreadsheet_id):
+    spreadsheet_id = subject_to_spreadsheet_id[subject]  # Use the spreadsheet ID for the selected subject
 
-    spreadsheet_info = service.spreadsheets().get(spreadsheetId=subject_to_spreadsheet_id[subject]).execute()
-    sheet_names = [sheet['properties']['title'] for sheet in spreadsheet_info.get('sheets', [])]
-    if new_sheet_name in sheet_names:
-        print("INSIDEEEEE")
-        # If the sheet already exists, return a message indicating so
-        return None
+    # Retrieve information about the "MasterSheet"
+    master_sheet_name = "MasterSheet"  # Replace with your actual master sheet name if different
+    range_name = f"{master_sheet_name}!A1:Z1"  # This range should be wide enough to cover all existing columns
 
-    # Fetch existing configuration data
-    result = service.spreadsheets().values().get(spreadsheetId=config_spreadsheet_id, range=config_range).execute()
-    values = result.get('values', [])
+    # Get the header row from the master sheet to find the last used column
+    header_row = service.spreadsheets().values().get(
+        spreadsheetId=spreadsheet_id, range=range_name
+    ).execute().get('values', [[]])[0]  # Get the first (and only) row
 
-    # Check if the subject already has an entry and determine the update range
-    row_to_update = None
-    for i, row in enumerate(values, start=2):  # Start=2 accounts for header row and 1-based indexing
-        if row and row[0] == subject:
-            row_to_update = i
-            break
+    # Find the index of the last column with data (the header row)
+    last_column_index = len(header_row) if header_row else 0
+    new_column_range = f"{master_sheet_name}!R1C{last_column_index + 1}"  # Using R1C1 notation for appending column
 
-    # Prepare the request body for updating or appending the active sheet name
-    if row_to_update:
-        # Subject found, prepare to update its active sheet name
-        update_range = f"Configuration!B{row_to_update}"
-        value_input_option = "RAW"
-        update_body = {
-            "values": [[new_sheet_name]]
-        }
-        service.spreadsheets().values().update(
-            spreadsheetId=config_spreadsheet_id, range=update_range,
-            valueInputOption=value_input_option, body=update_body
-        ).execute()
-    else:
-        # Subject not found, append a new entry
-        append_body = {
-            "values": [[subject, new_sheet_name]]
-        }
-        append_range = "Configuration!A:B"  # Append at the end of the Configuration sheet
-        service.spreadsheets().values().append(
-            spreadsheetId=config_spreadsheet_id, range=append_range,
-            valueInputOption="USER_ENTERED", body=append_body, insertDataOption="INSERT_ROWS"
-        ).execute()
-
+    # Append the new column with the TA-provided name
+    append_column_body = {
+        "values": [[column_name]]
+    }
     service.spreadsheets().values().update(
-        spreadsheetId=config_spreadsheet_id,
-        range="Configuration!B2",
-        valueInputOption="RAW",
-        body={"values": [[subject]]}  # Set the active subject
+        spreadsheetId=spreadsheet_id,
+        range=new_column_range,
+        valueInputOption="USER_ENTERED",
+        body=append_column_body
     ).execute()
 
-    # Return the active sheet name for further use
-    return new_sheet_name
+    # Optionally update configuration if needed
+    # Your existing logic for updating configuration goes here
+
+    return column_name
