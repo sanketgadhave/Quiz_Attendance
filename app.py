@@ -14,6 +14,9 @@ if 'authentication_failed' not in st.session_state:
     st.session_state['authentication_failed'] = False
 if 'batch_storage' not in st.session_state:
     st.session_state.batch_storage = []
+
+if 'selected_subject' not in st.session_state:
+    st.session_state['selected_subject'] = 'DIC'
 # Passcode for TA access
 TA_PASSCODE = "1234"
 subject_to_spreadsheet_id = {
@@ -46,7 +49,8 @@ if st.session_state.current_page == 'admin_login':
 if st.session_state.admin_authenticated and st.session_state.current_page == 'admin_page':
     subject = st.selectbox('Select Subject', ['DIC', 'DMQL'])
     st.session_state.selected_subject = subject
-
+    with open('active_subject.txt', 'w') as file:
+        file.write(st.session_state.selected_subject)
     new_column_name = st.text_input('Name for New Quiz Column',
                                     value='Quiz X')  # Provide a default or placeholder value
 
@@ -76,17 +80,23 @@ if st.session_state.current_page == 'main':
         submitted = st.form_submit_button("Submit")
 
         if submitted:
-            # Load the correct JSON file based on the selected subject
-            json_filename = f'qr_code_mappings/{st.session_state.selected_subject}.json'
             try:
-                with open(json_filename, 'r') as f:
-                    qr_code_mapping = json.load(f)
+                with open('active_subject.txt', 'r') as file:
+                    active_subject = file.read().strip()
+                # Load the correct JSON file based on the selected subject
+                json_filename = f'qr_code_mappings/{active_subject}.json'
+                try:
+                    with open(json_filename, 'r') as f:
+                        qr_code_mapping = json.load(f)
 
-                qr_code_filename = qr_code_mapping.get(ub_person_number)
-                if qr_code_filename:
-                    # Assuming the QR code images are stored relative to the Streamlit app's running directory
-                    st.image(qr_code_filename, caption="Your QR Code", width=300)
-                else:
-                    st.error("No QR code found for this UB Person Number.")
+                    qr_code_filename = qr_code_mapping.get(ub_person_number)
+                    if qr_code_filename:
+                        # Assuming the QR code images are stored relative to the Streamlit app's running directory
+                        st.image(qr_code_filename, caption="Your QR Code", width=300)
+                    else:
+                        st.error("No QR code found for this UB Person Number.")
+                except FileNotFoundError:
+                    st.error(f"The file {json_filename} does not exist. Please ensure the QR codes have been generated.")
             except FileNotFoundError:
-                st.error(f"The file {json_filename} does not exist. Please ensure the QR codes have been generated.")
+                st.error("The active subject file does not exist. Please ensure a TA has set the active subject.")
+                active_subject = None  # Or handle this case as appropriate for your application
