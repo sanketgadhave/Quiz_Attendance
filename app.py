@@ -1,36 +1,9 @@
-import threading
-
 import streamlit as st
-from src.generate_qr_code import generate_qr_code
-from src.update_excel import append_to_sheet
-from googleapiclient.errors import HttpError
 from src.update_excel import append_to_sheet, service
-import urllib.parse
-import configparser
 from src.update_configuration_sheet import update_configuration_sheet
-from src.sheet_management import get_active_sheet_name, get_active_subject
-from threading import Lock
-import time
-from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import build
-# New global variables for batch processing
-BATCH_SIZE = 2
-batch_storage = []
-batch_lock = Lock()
+import json
 
 
-def process_and_generate_qr(batch_data):
-    # Place your logic here for batch updating Google Sheets with batch_data
-    # And for generating QR codes. For example:
-    for submission in batch_data:
-        # Your existing logic to append to Google Sheets
-        # And generate QR codes
-
-        # Placeholder: Replace with actual call to append_to_sheet and generate QR code
-        print("Processing submission:", submission)
-
-    # This is where you'd send the QR codes to the users or make them retrievable
-    print("Batch processed.")
 
 
 if 'admin_authenticated' not in st.session_state:
@@ -39,6 +12,8 @@ if 'current_page' not in st.session_state:
     st.session_state.current_page = 'main'
 if 'authentication_failed' not in st.session_state:
     st.session_state['authentication_failed'] = False
+if 'batch_storage' not in st.session_state:
+    st.session_state.batch_storage = []
 # Passcode for TA access
 TA_PASSCODE = "1234"
 subject_to_spreadsheet_id = {
@@ -70,41 +45,20 @@ if st.session_state.current_page == 'admin_login':
 # Admin Page
 if st.session_state.admin_authenticated and st.session_state.current_page == 'admin_page':
     subject = st.selectbox('Select Subject', ['DIC', 'DMQL'])
-    if 'selected_sheet_name' not in st.session_state or st.session_state.selected_sheet_name is None:
-        st.session_state.selected_sheet_name = 'Sheet1'  # Default sheet name
-    new_sheet_name = st.text_input('Name for New Quiz Sheet', value=st.session_state.selected_sheet_name)
-    if st.button('Create New Sheet') and new_sheet_name:
-        active_sheet_name  = update_configuration_sheet(service, subject, new_sheet_name, subject_to_spreadsheet_id)
-        if active_sheet_name is None:
-            st.error(f"Sheet name '{new_sheet_name}' already exists. Please choose a different name.")
-        spreadsheet_id = subject_to_spreadsheet_id[subject]
-        # Code to create a new sheet within the selected Google Sheet
-        batch_update_request_body = {
-            "requests": [{"addSheet": {"properties": {"title": new_sheet_name}}}]
-        }
-        try:
-            # Create the new sheet
-            service.spreadsheets().batchUpdate(spreadsheetId=spreadsheet_id, body=batch_update_request_body).execute()
+    st.session_state.selected_subject = subject
 
-            # Prepare the headers
-            headers = [["First Name", "Last Name", "UB Person", "Attendance"]]
-            value_range_body = {
-                "values": headers
-            }
+    new_column_name = st.text_input('Name for New Quiz Column',
+                                    value='Quiz X')  # Provide a default or placeholder value
 
-            # Update the newly created sheet with headers
-            update_range = f"{new_sheet_name}!A1:D1"  # Adjust the range if necessary
-            service.spreadsheets().values().update(
-                spreadsheetId=spreadsheet_id,
-                range=update_range,
-                valueInputOption="RAW",
-                body=value_range_body
-            ).execute()
+    if st.button('Create New Column') and new_column_name:
+        # Call function to update the master sheet with a new column
+        # Assuming 'update_configuration_sheet' now handles adding a new column
+        success = update_configuration_sheet(service, subject, new_column_name, subject_to_spreadsheet_id)
 
-            st.success(f"Active sheet set to '{active_sheet_name}' for {subject}.")
-        except HttpError as error:
-            st.error(f"Failed to create new sheet: {error}")
-        st.session_state['active_sheet_name'] = active_sheet_name
+        if success:
+            st.success(f"New column '{new_column_name}' created successfully for {subject}.")
+        else:
+            st.error("Failed to create new column. Please try again.")
 
     if st.button('Log Out'):
         st.session_state.admin_authenticated = False
@@ -122,26 +76,17 @@ if st.session_state.current_page == 'main':
         submitted = st.form_submit_button("Submit")
 
         if submitted:
-            submission_data = {
-                "first_name": first_name,
-                "last_name": last_name,
-                "ub_person_number": ub_person_number,
-                # Any other data needed for processing
-            }
-            with batch_lock:
-                batch_storage.append(submission_data)
+            # Load the correct JSON file based on the selected subject
+            json_filename = f'qr_code_mappings/{st.session_state.selected_subject}.json'
+            try:
+                with open(json_filename, 'r') as f:
+                    qr_code_mapping = json.load(f)
 
-            # Check if the batch size is reached
-            process_batch = False
-            with batch_lock:
-                if len(batch_storage) >= BATCH_SIZE:
-                    process_batch = True
-
-            if process_batch:
-                # Processing is deferred to not block the Streamlit app
-                threading.Thread(target=process_and_generate_qr, args=(batch_storage.copy(),)).start()
-                with batch_lock:
-                    batch_storage.clear()
-
-            # Display a loading message
-            st.info("Please wait while we process your submission...")
+                qr_code_filename = qr_code_mapping.get(ub_person_number)
+                if qr_code_filename:
+                    # Assuming the QR code images are stored relative to the Streamlit app's running directory
+                    st.image(qr_code_filename, caption="Your QR Code", width=300)
+                else:
+                    st.error("No QR code found for this UB Person Number.")
+            except FileNotFoundError:
+                st.error(f"The file {json_filename} does not exist. Please ensure the QR codes have been generated.")
