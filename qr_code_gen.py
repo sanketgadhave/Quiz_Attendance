@@ -4,7 +4,7 @@ import json
 import os
 
 # Base URL for the Google Apps Script Web App handling attendance
-base_url = "https://script.google.com/macros/s/AKfycbzEoYDJhGOD2kIwmwZB0xBHOEp27_NwITMQ-qWe0OHDDRJ49T32lMCif8ZPlZEYz_JeEg/exec"
+base_url = "https://script.google.com/macros/s/AKfycbzAbQHVsv6bd-e7VQ034fYG34XgvkjiFefDCT0pRADy7u04PTPIefmjY_u4zNNJ33vUQA/exec"
 
 # Read the Excel file without header, assuming UB Person Numbers are in the first column (index 0)
 students_df = pd.read_excel("DIC_list.xlsx", usecols=[0], header=None)
