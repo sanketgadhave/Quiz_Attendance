@@ -99,7 +99,8 @@ if st.session_state.current_page == 'main':
                 try:
                     with open(json_filename, 'r') as f:
                         qr_code_mapping = json.load(f)
-
+                    print(active_subject)
+                    print(qr_code_mapping)
                     qr_code_filename = qr_code_mapping.get(ub_person_number)
                     if qr_code_filename:
                         # Assuming the QR code images are stored relative to the Streamlit app's running directory
