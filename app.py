@@ -18,7 +18,7 @@ if 'batch_storage' not in st.session_state:
 if 'selected_subject' not in st.session_state:
     st.session_state['selected_subject'] = 'DIC'
 # Passcode for TA access
-TA_PASSCODE = "1234"
+TA_PASSCODE = "8956"
 subject_to_spreadsheet_id = {
     'DIC': '17zLyXGck6_1tGc7cf_KWFWDsV5RZzu7o5kHlkWN8JEc',
     'DMQL': '1wxcqkT3EhV_4sXhIFTMTadvDvgmnGSQK6OhvihAigI0',
@@ -47,17 +47,27 @@ if st.session_state.current_page == 'admin_login':
 
 # Admin Page
 if st.session_state.admin_authenticated and st.session_state.current_page == 'admin_page':
-    subject = st.selectbox('Select Subject', ['DIC', 'DMQL'])
+    subject = st.selectbox('Select Subject/Section', ['DIC_A', 'DIC_C', 'DMQL_A'])
     st.session_state.selected_subject = subject
     with open('active_subject.txt', 'w') as file:
-        file.write(st.session_state.selected_subject)
+        file.write(subject)
+
     new_column_name = st.text_input('Name for New Quiz Column',
                                     value='Quiz X')  # Provide a default or placeholder value
 
     if st.button('Create New Column') and new_column_name:
-        # Call function to update the master sheet with a new column
-        # Assuming 'update_configuration_sheet' now handles adding a new column
-        success = update_configuration_sheet(service, subject, new_column_name, subject_to_spreadsheet_id)
+        master_sheet_name = 'default'
+        spreadsheet_id = 'default'
+        # Adapt to handle sections within DIC and separate DMQL subject
+        if 'DIC' in subject:
+            spreadsheet_id = subject_to_spreadsheet_id['DIC']  # DIC spreadsheet ID
+            # Adjust the master_sheet_name based on the section (A or C)
+            master_sheet_name = 'MasterSheet_A' if 'A' in subject else 'MasterSheet_C'
+        elif 'DMQL' in subject:
+            spreadsheet_id = subject_to_spreadsheet_id['DMQL']  # DMQL spreadsheet ID
+            master_sheet_name = 'MasterSheet_A'  # Assuming a single master sheet for DMQL
+
+        success = update_configuration_sheet(service, master_sheet_name, new_column_name, spreadsheet_id)
 
         if success:
             st.success(f"New column '{new_column_name}' created successfully for {subject}.")
@@ -84,6 +94,7 @@ if st.session_state.current_page == 'main':
                 with open('active_subject.txt', 'r') as file:
                     active_subject = file.read().strip()
                 # Load the correct JSON file based on the selected subject
+                print(active_subject)
                 json_filename = f'qr_code_mappings/{active_subject}.json'
                 try:
                     with open(json_filename, 'r') as f:
