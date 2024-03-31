@@ -4,13 +4,13 @@ import json
 import os
 
 # Base URL for the Google Apps Script Web App handling attendance
-base_url = "https://script.google.com/macros/s/AKfycbzAbQHVsv6bd-e7VQ034fYG34XgvkjiFefDCT0pRADy7u04PTPIefmjY_u4zNNJ33vUQA/exec"
+base_url = "https://script.google.com/macros/s/AKfycbygGsDmryP4vzEyaH9--iyCR6WPK-E-DpObn3mS_mRPlA704bo5M4goxUgHn8x0nT_t/exec"
 
 # Read the Excel file without header, assuming UB Person Numbers are in the first column (index 0)
-students_df = pd.read_excel("DIC_list.xlsx", usecols=[0], header=None)
+students_df = pd.read_excel("DMQL_list.xlsx", usecols=[0, 1], header=None)
 
 # Directory for QR codes
-qr_code_dir = 'qr_codes/DIC'  # Adjusted to include subject in the path
+qr_code_dir = 'qr_codes/DMQL_A'  # Adjusted to include subject in the path
 if not os.path.exists(qr_code_dir):
     os.makedirs(qr_code_dir)
 
@@ -19,9 +19,9 @@ qr_code_mappings = {}
 
 for index, row in students_df.iterrows():
     ub_person_number_str = str(row[0])  # Access by column index
-
+    section = str(row[1])
     # Updated QR data to include only ubPersonNumber in the query parameters
-    qr_data = f"{base_url}?ubPersonNumber={ub_person_number_str}"
+    qr_data = f"{base_url}?ubPersonNumber={ub_person_number_str}&section={section}"
 
     # Generate QR code
     qr = qrcode.QRCode(
@@ -34,12 +34,12 @@ for index, row in students_df.iterrows():
     qr.make(fit=True)
     img = qr.make_image(fill='black', back_color='white')
 
-    qr_filename = f"{qr_code_dir}/{ub_person_number_str}.png"
+    qr_filename = f"{qr_code_dir}/{ub_person_number_str}_{section}.png"
     img.save(qr_filename)
-    qr_code_mappings[ub_person_number_str] = qr_filename
+    qr_code_mappings[f"{ub_person_number_str}"] = qr_filename
 
 # Save the mappings to a JSON file
-json_filename = 'qr_code_mappings/DIC.json'  # Adjusted path to include subject
+json_filename = 'qr_code_mappings/DMQL_A.json'
 if not os.path.exists('qr_code_mappings'):
     os.makedirs('qr_code_mappings')
 with open(json_filename, 'w') as json_file:
