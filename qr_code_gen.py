@@ -4,13 +4,13 @@ import json
 import os
 
 # Base URL for the Google Apps Script Web App handling attendance
-base_url = "https://script.google.com/macros/s/AKfycbybaZ9qQvXZEbNAQ9fpXh0PHwxOZyb4unG1EmeUz4dy2dfBX78KVxIBjkQeUiuwjtCqpw/exec"
+base_url = "https://script.google.com/macros/s/AKfycbxEjzRJVlZ7CB0WSbsoogiI4MXgGVMCM39ITWaaGjT7krzT_FEVFBoax2V6gTDZQIdq/exec"
 
 # Read the Excel file without header, assuming UB Person Numbers are in the first column (index 0)
-students_df = pd.read_excel("DIC_list_C.xlsx", usecols=[0, 1], header=None)
+students_df = pd.read_excel("DMQL_list.xlsx", usecols=[0, 1], header=None)
 
 # Directory for QR codes
-qr_code_dir = 'qr_codes/DIC_C'  # Adjusted to include subject in the path
+qr_code_dir = 'qr_codes/DMQL_A'  # Adjusted to include subject in the path
 if not os.path.exists(qr_code_dir):
     os.makedirs(qr_code_dir)
 
@@ -39,7 +39,7 @@ for index, row in students_df.iterrows():
     qr_code_mappings[f"{ub_person_number_str}"] = qr_filename
 
 # Save the mappings to a JSON file
-json_filename = 'qr_code_mappings/DIC_C.json'
+json_filename = 'qr_code_mappings/DMQL_A.json'
 if not os.path.exists('qr_code_mappings'):
     os.makedirs('qr_code_mappings')
 with open(json_filename, 'w') as json_file:
